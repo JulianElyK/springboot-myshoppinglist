@@ -86,4 +86,15 @@ public class DaftarBelanja
 //        for (int i = 0; i < daftarBrg.size(); i++)
 //            daftarBrg.get(i).setInduk(this);
     }
+
+    @Override
+    public String toString() {
+        String str = "[" + id + "] " + judul + " (" + tanggal + ")\n";
+        
+        for(DaftarBelanjaDetil brg : daftarBrg) {
+            str += "\t" + brg.toString() + "\n";
+        }
+        
+        return str;
+    }
 }

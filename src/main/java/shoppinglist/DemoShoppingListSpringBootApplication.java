@@ -12,6 +12,7 @@ import shoppinglist.repository.DaftarBelanjaRepo;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import org.springframework.data.domain.Example;
 
 @SpringBootApplication
 public class DemoShoppingListSpringBootApplication implements CommandLineRunner
@@ -27,75 +28,107 @@ public class DemoShoppingListSpringBootApplication implements CommandLineRunner
     @Override
     public void run(String... args) throws Exception
     {
-        System.out.println("Membaca Semua Record DaftarBelanja:");
-        List<DaftarBelanja> all = repo.findAll();
-        for (DaftarBelanja db : all) {
-            System.out.println("[" + db.getId() + "] " + db.getJudul());
-
-            List<DaftarBelanjaDetil> listBarang = db.getDaftarBarang();
-            for (DaftarBelanjaDetil barang : listBarang) {
-                System.out.println("\t" + barang.getNamaBarang() + " " + barang.getByk() + " " + barang.getSatuan());
-            }
-        }
-        
         Scanner keyb = new Scanner(System.in);
         
+        // Baca semua DaftarBelanja
+        System.out.println("Membaca Semua Record DaftarBelanja:");
+        bacaSemuaList();
+        
         // Baca berdasarkan ID
-        System.out.print("Masukkan ID dari objek DaftarBelanja yg ingin ditampilkan: ");
+        System.out.println("Masukkan ID dari objek DaftarBelanja yg ingin ditampilkan: ");
         long id = Long.parseLong(keyb.nextLine());
+        
         System.out.println("Hasil pencarian: ");
         bacaBerdasarkanId(id);
         
         // Mencari DaftarBelanja berdasarkan kemiripan judul
-        System.out.print("Masukkan judul DaftarBelanja yang ingin dicari: ");
+        System.out.println("Masukkan judul DaftarBelanja yang ingin dicari: ");
         String judul = keyb.nextLine();
-        DaftarBelanja db = new DaftarBelanja();
-        db.setJudul(judul);
-//        optDB = repo.findOne();
         
-        System.out.println("Hasil");
+        System.out.println("Hasil pencarian: ");
+        cariBerdasarkanJudul(judul);
         
         // Menyimpan DaftarBelanja
-        System.out.print("Masukkan judul DaftarBelanja: ");
+        System.out.println("Masukkan judul DaftarBelanja: ");
         judul = keyb.nextLine();
         
+        DaftarBelanja db = new DaftarBelanja();
         db.setJudul(judul);
         db.setTanggal(LocalDateTime.now());
         
-        System.out.print("Masukkan jumlah barang dalam list: ");
+        System.out.println("Masukkan jumlah barang dalam list: ");
         int jmlh = Integer.parseInt(keyb.nextLine());
         
-        for (int i = 1; i <= jmlh; i++) {
-            System.out.print("Masukkan nama barang " + i +": ");
+        DaftarBelanjaDetil listDetil[] = new DaftarBelanjaDetil[jmlh];
+        for (int i = 0; i < jmlh; i++) {
+            System.out.println("\nMasukkan nama barang " + (i+1) +": ");
             String nama = keyb.nextLine();
             
-            System.out.print("Masukkan banyak barang " + i +": ");
-            int bnyk = Integer.parseInt(keyb.nextLine());
+            System.out.println("Masukkan banyak barang " + (i+1) +": ");
+            float bnyk = Float.parseFloat(keyb.nextLine());
             
-            System.out.print("Masukkan satuan banyak barang " + i +": ");
+            System.out.println("Masukkan satuan banyak barang " + (i+1) +": ");
             String satuan = keyb.nextLine();
             
-            System.out.print("Tulis memo barang " + i +": ");
+            System.out.println("Tulis memo barang " + (i+1) +": ");
             String memo = keyb.nextLine();
             
-            DaftarBelanjaDetil dbd = new DaftarBelanjaDetil();
-            dbd.setNoUrut(i);
-            dbd.setNamaBarang(nama);
-            dbd.setByk(bnyk);
-            dbd.setSatuan(satuan);
-            dbd.setMemo(memo);
-            
-            db.getDaftarBarang().add(dbd);
+            listDetil[i] = new DaftarBelanjaDetil();
+            listDetil[i].setNamaBarang(nama);
+            listDetil[i].setByk(bnyk);
+            listDetil[i].setSatuan(satuan);
+            listDetil[i].setMemo(memo);
+        }
+        simpanDaftarBelanja(db, listDetil);
+    }
+    
+    private void bacaSemuaList() {
+        List<DaftarBelanja> all = repo.findAll();
+        
+        for(DaftarBelanja db : all) {
+            System.out.println(db.toString());
         }
     }
     
-    private void bacaBerdasarkanId(long id){
+    private void cariBerdasarkanJudul(String judul) {
+        List<DaftarBelanja> listDB = repo.findByJudulLike(judul + "%");
+        
+        if (listDB.size() > 0) {
+            for (DaftarBelanja db : listDB) {
+                System.out.println(db.toString());
+            }
+        } else {
+            System.out.println("\tTIDAK DITEMUKAN.\n");
+        }
+    }
+    
+    private void bacaBerdasarkanId(long id) {
         Optional<DaftarBelanja> optDB = repo.findById(id);
+        
         if (optDB.isPresent()) {
             DaftarBelanja db = optDB.get();
-            System.out.println("\tJudul: " + db.getJudul());
+            System.out.println(db.toString());
         } else {
-            System.out.println("\tTIDAK DITEMUKAN.");
+            System.out.println("\tTIDAK DITEMUKAN.\n");
+        }
+    }
+    
+    private void simpanDaftarBelanja(DaftarBelanja db, DaftarBelanjaDetil listDetil[]) {
+        try {
+            repo.save(db);
+            
+            int noUrut = 1;
+            for (DaftarBelanjaDetil detil : listDetil) {
+                detil.setId(db.getId(), noUrut++);
+                db.addDaftarBarang(detil);
+            }
+            
+            repo.save(db);
+
+            System.out.println("\nTersimpan dengan id " + db.getId());
+        }
+        catch (Exception e) {
+            e.printStackTrace(System.out);
         }
     }
 }

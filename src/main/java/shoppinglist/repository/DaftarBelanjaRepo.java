@@ -5,6 +5,7 @@
  */
 package shoppinglist.repository;
 
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import shoppinglist.entity.DaftarBelanja;
 
@@ -13,4 +14,5 @@ import shoppinglist.entity.DaftarBelanja;
  */
 public interface DaftarBelanjaRepo extends JpaRepository<DaftarBelanja, Long>
 {
+    List<DaftarBelanja> findByJudulLike(String judul);
 }

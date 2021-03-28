@@ -116,4 +116,13 @@ public class DaftarBelanjaDetil
     {
         this.memo = _memo;
     }
+
+    @Override
+    public String toString() {
+        if (id == null) 
+            return noUrut + "-" + namaBarang + ": " + byk + " " + satuan + " [" + memo + "]";
+        else
+            return id.getNoUrut() + "-" + namaBarang + ": " + byk + " " + satuan + " [" + memo + "]";
+            
+    }
 }
