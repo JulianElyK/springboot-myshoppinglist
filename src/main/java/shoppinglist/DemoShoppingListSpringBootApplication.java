@@ -48,38 +48,47 @@ public class DemoShoppingListSpringBootApplication implements CommandLineRunner
         System.out.println("Hasil pencarian: ");
         cariBerdasarkanJudul(judul);
         
-        // Menyimpan DaftarBelanja
-        System.out.println("Masukkan judul DaftarBelanja: ");
-        judul = keyb.nextLine();
+//        // Menyimpan DaftarBelanja
+//        System.out.println("Masukkan judul DaftarBelanja: ");
+//        judul = keyb.nextLine();
+//        
+//        DaftarBelanja db = new DaftarBelanja();
+//        db.setJudul(judul);
+//        db.setTanggal(LocalDateTime.now());
+//        
+//        System.out.println("Masukkan jumlah barang dalam list: ");
+//        int jmlh = Integer.parseInt(keyb.nextLine());
+//        
+//        DaftarBelanjaDetil listDetil[] = new DaftarBelanjaDetil[jmlh];
+//        for (int i = 0; i < jmlh; i++) {
+//            System.out.println("\nMasukkan nama barang " + (i+1) +": ");
+//            String nama = keyb.nextLine();
+//            
+//            System.out.println("Masukkan banyak barang " + (i+1) +": ");
+//            float bnyk = Float.parseFloat(keyb.nextLine());
+//            
+//            System.out.println("Masukkan satuan banyak barang " + (i+1) +": ");
+//            String satuan = keyb.nextLine();
+//            
+//            System.out.println("Tulis memo barang " + (i+1) +": ");
+//            String memo = keyb.nextLine();
+//            
+//            listDetil[i] = new DaftarBelanjaDetil();
+//            listDetil[i].setNamaBarang(nama);
+//            listDetil[i].setByk(bnyk);
+//            listDetil[i].setSatuan(satuan);
+//            listDetil[i].setMemo(memo);
+//        }
+//        simpanDaftarBelanja(db, listDetil);
         
-        DaftarBelanja db = new DaftarBelanja();
-        db.setJudul(judul);
-        db.setTanggal(LocalDateTime.now());
+        // Update DaftarBelanja
         
-        System.out.println("Masukkan jumlah barang dalam list: ");
-        int jmlh = Integer.parseInt(keyb.nextLine());
+        // Hapus DaftarBelanja
+        System.out.println("Masukkan id DaftarBelanja yang ingin dihapus: ");
+        id = Long.parseLong(keyb.nextLine());
         
-        DaftarBelanjaDetil listDetil[] = new DaftarBelanjaDetil[jmlh];
-        for (int i = 0; i < jmlh; i++) {
-            System.out.println("\nMasukkan nama barang " + (i+1) +": ");
-            String nama = keyb.nextLine();
-            
-            System.out.println("Masukkan banyak barang " + (i+1) +": ");
-            float bnyk = Float.parseFloat(keyb.nextLine());
-            
-            System.out.println("Masukkan satuan banyak barang " + (i+1) +": ");
-            String satuan = keyb.nextLine();
-            
-            System.out.println("Tulis memo barang " + (i+1) +": ");
-            String memo = keyb.nextLine();
-            
-            listDetil[i] = new DaftarBelanjaDetil();
-            listDetil[i].setNamaBarang(nama);
-            listDetil[i].setByk(bnyk);
-            listDetil[i].setSatuan(satuan);
-            listDetil[i].setMemo(memo);
-        }
-        simpanDaftarBelanja(db, listDetil);
+        hapusDaftarBelanja(id);
+        
     }
     
     private void bacaSemuaList() {
@@ -128,6 +137,16 @@ public class DemoShoppingListSpringBootApplication implements CommandLineRunner
             System.out.println("\nTersimpan dengan id " + db.getId());
         }
         catch (Exception e) {
+            e.printStackTrace(System.out);
+        }
+    }
+    
+    private void hapusDaftarBelanja(Long id) {
+        try {
+            repo.deleteById(id);
+            
+            System.out.println("\nDaftarBelanja dengan id " + id + " sudah dihapus");
+        } catch (Exception e) {
             e.printStackTrace(System.out);
         }
     }

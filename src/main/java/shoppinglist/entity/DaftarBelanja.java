@@ -30,8 +30,7 @@ public class DaftarBelanja
     @Column
     private String judul;
     
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    @JoinColumn(name = "daftarbelanja_id")
+    @OneToMany(mappedBy = "induk", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DaftarBelanjaDetil> daftarBrg;
 
     public DaftarBelanja()
@@ -77,23 +76,22 @@ public class DaftarBelanja
     public void addDaftarBarang(DaftarBelanjaDetil _brg)
     {
         daftarBrg.add(_brg);
-        //_brg.setInduk(this);
+        _brg.setInduk(this);
     }
 
     public void setDaftarBarang(List<DaftarBelanjaDetil> _daftarBrg)
     {
         this.daftarBrg = _daftarBrg;
-//        for (int i = 0; i < daftarBrg.size(); i++)
-//            daftarBrg.get(i).setInduk(this);
+        for (int i = 0; i < daftarBrg.size(); i++)
+            daftarBrg.get(i).setInduk(this);
     }
 
     @Override
     public String toString() {
         String str = "[" + id + "] " + judul + " (" + tanggal + ")\n";
         
-        for(DaftarBelanjaDetil brg : daftarBrg) {
+        for(DaftarBelanjaDetil brg : daftarBrg)
             str += "\t" + brg.toString() + "\n";
-        }
         
         return str;
     }
